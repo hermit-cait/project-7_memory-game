@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory game</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <script>
+      var id = "";
+      var imgSource = "";
+      var currentOpened = "";
+      var divId = "";
+      var imgFound = 0;
+      var moves = 0;
+      var imageArray = [
+        "mem-1.png",
+        "mem-2.png",
+        "mem-3.png",
+        "mem-4.png",
+        "mem-5.png",
+        "mem-6.png",
+        "mem-7.png",
+        "mem-8.png",
+        "mem-9.png",
+        "mem-10.png",
+      ];
+
+      function shuffleImages() {
+        var length = imageArray.length * 2;
+        var secondArray = new Array();
+        secondArray = $.merge($.merge([], imageArray), imageArray);
+        var currentDiv = $("#images div:first-child");
+        for (var z = 0; z < length; z++) {
+          var random = Math.round(Math.random()*(secondArray.length - 1));
+          $("#" + currentDiv.attr("id") + " img").attr("src", secondArray[random]);
+          secondArray.splice(random, 1);
+          currentDiv = currentDiv.next();
+        }
+      };  
+
+      function openCard() {
+        id = $(this).attr("id");
+        if ($("#" + id + " img").is(":hidden")) {
+          $("#" + id + " img").show(100);
+          
+          if (imgSource == "") {
+            divId = id;
+            imgSource = $("#" + id + " img").attr("src");
+          } else {
+            currentOpened = $("#" + id + " img").attr("src");
+            if (imgSource != currentOpened) {
+              setTimeout(function() {
+                $("#" + id + " img").hide(100);              
+                $("#" + divId + " img").hide(100);
+                imgSource = "";
+                divId = "";
+              }, 400);
+            } else {
+              imgSource = "";
+              divId = "";
+              imgFound++;
+            };
+          };        
+          moves++;  
+          $("#moves").html(moves);
+          if (imageArray.length == imgFound) {
+            setTimeout(function() {
+              alert("Congrats, you won! You completed the game in " + moves + " moves.")
+            }, 400);
+          };    
+        };
+      };
+
+      function resetGame() {
+        shuffleImages();
+        moves = 0;
+        $("#moves").html(moves);
+        $("#images div img").hide();
+        imgFound = 0;
+        imgSource = "";
+        divId = "";
+      };
+
+      $(document).ready(function() {
+        for (var i = 1; i < 3; i++) {
+          $.each(imageArray, function(index, value) {
+            $("#images").append("<div id=card-" + i + index + "><img src=" + value + " /></div>");
+          });
+        };
+        shuffleImages();
+        $("#images div").click(openCard);
+      });
+
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+      body {
+        background-color: #333;
+      }
+      #container {
+        margin: 0 auto;
+        width: 36rem;
+        font: 1rem "Roboto";
+      }
+      #information {
+        color: snow;
+        text-align: center;
+        margin-top: 5rem;
+      }
+      .button {
+        background-color: black;
+        margin: 1rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        cursor: pointer;      
+      }
+      #images {
+        width: 32rem;      
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 2rem;
+        margin-top: 1rem;
+      }
+      img {
+        width: 5rem;
+        height: 5rem;
+        display: none;
+      }
+      #images div {
+        background-color: gainsboro;
+        width: 5rem;
+        height: 5rem;
+        border: 3px solid black;
+        border-radius: 1rem;
+        cursor: pointer;  
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="information">
+        <span class="text">Moves: </span>      
+        <span id="moves" class="text">0</span>
+        <a class="button" onclick="resetGame();">Reset</a>
+      </div>
+      <div id="images"></div>
+    </div>
+  </body>
+</html>
